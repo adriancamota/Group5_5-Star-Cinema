@@ -1,4 +1,4 @@
-
+--Database DML--
 
 -- Inserting 10 records into 'movies'
 INSERT INTO movies (MovieID, Title, Director, Genre, ReleaseDate, TimeDuration, Price, PhotoURL) VALUES
