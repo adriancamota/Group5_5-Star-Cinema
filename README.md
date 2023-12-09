@@ -1,7 +1,7 @@
 # Group5_5-Star-Cinema
 To run our system in your device you need XAMPP and Visual Studio.
 Using XAMPP run phpMyAdmin and Import the FINAL DATABASE SQL.sql.
-Then open Visual Studio and use G5 Cinema.
+Then open use G5 Cinema in you Visual Studio.
 After that you can now run our system in you device.
 If you want to see the Database properly check EDR or use pgAdmin and query DDL and DML.
 
