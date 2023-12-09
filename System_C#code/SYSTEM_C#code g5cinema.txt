@@ -1,0 +1,1959 @@
+SYSTEM_C#code g5cinema
+
+---Login---
+using MySql.Data.MySqlClient;
+namespace G5_Cinema
+{
+    public partial class Form1 : Form
+    {
+        private MySqlConnection connection;
+
+        public Form1()
+        {
+            InitializeComponent();
+            InitializeDatabase();
+        }
+
+        private void InitializeDatabase()
+        {
+            // Establish a connection to the database
+            string connectionString = "server=127.0.0.1; user=root; database=g5cinema; password=";
+            connection = new MySqlConnection(connectionString);
+
+        }
+
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            textBox2.UseSystemPasswordChar = true;
+            
+            this.AcceptButton = button1;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string email = textBox1.Text;
+            string password = textBox2.Text;
+
+            if (email == "admin" && password == "adminpass")
+            {
+                // Admin login, open admin form
+                this.Hide();
+                AdminForm adminForm = new AdminForm();
+                adminForm.ShowDialog();
+            }
+
+            else
+            { // Validate input
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+                {
+                    MessageBox.Show("Please enter both email and password.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Check the entered credentials against the database using parameterized query
+                string selectQuery = "SELECT * FROM userinfo WHERE Email = @Email AND Password = @Password";
+
+                try
+                {
+                    connection.Open();
+                    MySqlCommand command = new MySqlCommand(selectQuery, connection);
+                    command.Parameters.AddWithValue("@Email", email);
+                    command.Parameters.AddWithValue("@Password", password);
+
+                    MySqlDataReader reader = command.ExecuteReader();
+
+                    if (reader.HasRows)
+                    {
+                        reader.Read(); // Read the first row
+                        string userName = reader["Username"].ToString();
+                        MessageBox.Show($"Welcome, {userName}! Login successful.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+
+                        // Regular user login, open MovieSelection form
+                        this.Hide();
+                        MovieSelection frm2 = new MovieSelection();
+                        frm2.ShowDialog();
+
+                    }
+                    else
+                    {
+                        MessageBox.Show("Invalid credentials. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            SignUp frm3 = new SignUp();
+            frm3.ShowDialog();
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+
+
+
+            if (checkBox1.Checked)
+            {
+                textBox2.UseSystemPasswordChar = false; // Show password
+            }
+            else
+            {
+                textBox2.UseSystemPasswordChar = true; // Hide password
+            }
+        }
+    }
+}
+
+---SignUp---
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+
+namespace G5_Cinema
+{
+    public partial class SignUp : Form
+    {
+        private MySqlConnection connection;
+        private MySqlDataAdapter dataAdapter;
+        private DataSet dataSet;
+        public SignUp()
+        {
+            InitializeComponent();
+            InitializeDatabase();
+        }
+
+        private void InitializeDatabase()
+        {
+            string connectionString = "server=127.0.0.1; user=root; database=g5cinema; password=";
+            connection = new MySqlConnection(connectionString);
+            dataAdapter = new MySqlDataAdapter("SELECT * FROM Users", connection);
+            dataSet = new DataSet();
+        }
+
+        private void SignUp_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string fname = textBox1.Text;
+            string lname = textBox2.Text;
+            string email = textBox3.Text;
+            string userName = textBox6.Text;
+            string password = textBox4.Text;
+            string confirmPassword = textBox5.Text;
+            string gender = comboBox1.Text;
+            DateTime birthday = dateTimePicker1.Value;
+
+            // Validate input
+            if (string.IsNullOrWhiteSpace(fname) || string.IsNullOrWhiteSpace(lname) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password) ||
+                string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(confirmPassword) || string.IsNullOrWhiteSpace(gender))
+            {
+                MessageBox.Show("Please fill in all fields.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (password != confirmPassword)
+            {
+                MessageBox.Show("Passwords do not match.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            string insertQuery = "INSERT INTO userinfo (FirstName, LastName, Email, Username, Password, Gender, Birthday) VALUES (@FirstName, @LastName, @Email, @Username, @Password, @Gender, @Birthday)";
+
+            try
+            {
+                connection.Open();
+                MySqlCommand command = new MySqlCommand(insertQuery, connection);
+                command.Parameters.AddWithValue("@FirstName", fname);
+                command.Parameters.AddWithValue("@LastName", lname);
+                command.Parameters.AddWithValue("@Email", email);
+                command.Parameters.AddWithValue("Username", userName);
+                command.Parameters.AddWithValue("@Password", password);
+                command.Parameters.AddWithValue("@Gender", gender);
+                command.Parameters.AddWithValue("@Birthday", birthday);
+
+                command.ExecuteNonQuery();
+
+                MessageBox.Show("Registration successful!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            this.Hide();
+            Form1 loginfrm = new Form1();
+            loginfrm.Show();
+        }
+
+        private void label8_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Form1 loginfrm = new Form1();
+            loginfrm.Show();
+        }
+    }
+}
+
+---Movie Selection---
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Common;
+using static System.ComponentModel.Design.ObjectSelectorEditor;
+
+namespace G5_Cinema
+{
+    public partial class MovieSelection : Form
+
+    {
+        private string selectedMovie = "";
+        private string selectedGenre = "";
+
+        private MySqlConnection connection;
+        
+        public MovieSelection(bool fromBooking = false, string selectedMovie = "")
+        {
+            InitializeComponent();
+            InitializeDatabase();
+            LoadMovies();
+            LoadGenres();
+            
+
+            
+        }
+
+        private void InitializeDatabase()
+        {
+            string connectionString = "server=127.0.0.1; user=root; database=g5cinema; password=";
+            connection = new MySqlConnection(connectionString);
+        }
+        private void MovieSelection_Load(object sender, EventArgs e)
+        {
+            
+                DisplayRandomMovie();
+            }
+
+        private void LoadMovies()
+        {
+            // Load movie titles into the ComboBox in alphabetical order
+            string selectQuery = "SELECT Title FROM movies ORDER BY Title";
+
+            try
+            {
+                connection.Open();
+                MySqlCommand command = new MySqlCommand(selectQuery, connection);
+                MySqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    comboBox1.Items.Add(reader["Title"].ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        private void LoadGenres()
+        {
+            // Load genre names into the ComboBox in alphabetical order
+            string selectQuery = "SELECT GenreName FROM genres ORDER BY GenreName" ;
+
+            try
+            {
+                connection.Open();
+                MySqlCommand command = new MySqlCommand(selectQuery, connection);
+                MySqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    comboBox2.Items.Add(reader["GenreName"].ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            
+            string selectedMovieTitle = comboBox1.SelectedItem?.ToString();
+            string selectMovieQuery = "SELECT m.*, g.GenreName\r\nFROM movies m\r\nJOIN genres g ON m.Title = g.Title\r\nWHERE m.Title = @Title;";
+
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection("server=127.0.0.1; user=root; database=g5cinema; password="))
+                {
+                    connection.Open();
+                MySqlCommand command = new MySqlCommand(selectMovieQuery, connection);
+                command.Parameters.AddWithValue("@Title", selectedMovieTitle);
+
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+
+
+
+                        if (reader.Read())
+                        {
+
+                            label1.Text = $"Title: {reader["Title"]}";
+                            label2.Text = $"Director: {reader["Director"]}";
+                            label3.Text = $"Genre: {reader["Genre"]}";
+                            label4.Text = $"Release Date: {((DateTime)reader["ReleaseDate"]).ToShortDateString()}";
+                            label5.Text = $"Time Duration: {reader["TimeDuration"]}";
+                            label6.Text = $"Price: {reader["Price"]}";
+                            label7.Text = $"{reader["Title"]}";
+
+
+                            // Get the PhotoURL of the selected movie
+                            string photoUrl = reader["PhotoURL"].ToString();
+                            DisplayImageFromUrl(photoUrl);
+
+                            comboBox2.SelectedItem = reader["GenreName"].ToString();
+
+                        }
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        private void DisplayImageFromUrl(string imageUrl)
+        {
+            try
+            {
+                WebClient webClient = new WebClient();
+                byte[] imageData = webClient.DownloadData(imageUrl);
+
+                using (MemoryStream ms = new MemoryStream(imageData))
+                {
+                    Image image = Image.FromStream(ms);
+                    pictureBox1.Image = image; // Display the image in pictureBox1
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading image: " + ex.Message);
+            }
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Booking Bookingfrm = new Booking();
+            Bookingfrm.SelectedMovie = comboBox1.SelectedItem?.ToString();
+            Bookingfrm.ShowDialog();
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+            
+
+
+            // When a genre is selected, display its description
+            string selectedGenre = comboBox2.SelectedItem?.ToString();
+            string selectDescriptionQuery = "SELECT m.Title, m.Director, m.Genre, m.ReleaseDate, m.TimeDuration, m.Price, m.PhotoURL FROM movies m JOIN genres g ON m.Title = g.Title WHERE g.GenreName = @GenreName;";
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection("server=127.0.0.1; user=root; database=g5cinema; password="))
+                {
+                    connection.Open();
+                    MySqlCommand command = new MySqlCommand(selectDescriptionQuery, connection);
+                     command.Parameters.AddWithValue("@GenreName", selectedGenre);
+                    object result = command.ExecuteScalar();
+                    using (MySqlDataReader reader = command.ExecuteReader()) {
+
+
+
+                        while (reader.Read())
+                        {
+                            if (result != null)
+                            {
+
+
+                                label7.Text = result.ToString();
+
+
+
+
+                                label1.Text = $"Title: {reader["Title"]}";
+                                label2.Text = $"Director: {reader["Director"]}";
+                                label3.Text = $"Genre: {reader["Genre"]}";
+                                label4.Text = $"Release Date: {((DateTime)reader["ReleaseDate"]).ToShortDateString()}";
+                                label5.Text = $"Time Duration: {reader["TimeDuration"]}";
+                                label6.Text = $"Price: {reader["Price"]}";
+
+
+
+                                // Get the PhotoURL of the selected movie
+                                string photoUrl = reader["PhotoURL"].ToString();
+                                DisplayImageFromUrl(photoUrl);
+
+
+
+                                comboBox1.SelectedItem = reader["Title"].ToString();
+
+
+                            }
+                            else
+                            {
+                                label7.Text = "No Suggestion available";
+                            }
+
+
+                             
+
+
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+               
+                    connection.Close();
+                
+            }
+        }
+
+        
+
+        private void label7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Form1 frm1 = new Form1();
+            frm1.ShowDialog();
+        }
+
+        // Method to set selected values
+        public void SetSelectedValues(string movie, string genre)
+        {
+            selectedMovie = movie;
+            selectedGenre = genre;
+        }
+
+        // Method to restore selected values
+        public void RestoreSelectedValues()
+        {
+            comboBox1.Text = selectedMovie;
+            comboBox2.Text = selectedGenre;
+        }
+
+        private void DisplayRandomMovie()
+        {
+            string selectRandomMovieQuery = "SELECT m.Title, m.Director, m.Genre, m.ReleaseDate, m.TimeDuration, m.Price, m.PhotoURL, g.GenreName " +
+                                    "FROM movies m " +
+                                    "JOIN genres g ON m.Genre = g.GenreName " +
+                                    "ORDER BY RAND() LIMIT 1";
+
+            try
+            {
+                connection.Open();
+                MySqlCommand command = new MySqlCommand(selectRandomMovieQuery, connection);
+                MySqlDataReader reader = command.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    label1.Text = $"Title: {reader["Title"]}";
+                    label2.Text = $"Director: {reader["Director"]}";
+                    label3.Text = $"Genre: {reader["GenreName"]}";
+                    label4.Text = $"Release Date: {((DateTime)reader["ReleaseDate"]).ToShortDateString()}";
+                    label5.Text = $"Time Duration: {reader["TimeDuration"]}";
+                    label6.Text = $"Price: {reader["Price"]}";
+                    label7.Text = $"{reader["Title"]}";
+
+                    // Get the PhotoURL of the selected movie
+                    string photoUrl = reader["PhotoURL"].ToString();
+                    DisplayImageFromUrl(photoUrl);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+        }
+    }
+}
+
+---Booking---
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+namespace G5_Cinema
+{
+    public partial class Booking : Form
+
+
+    {
+        private MovieSelection movieSelectionForm;
+
+        // Property to store reference to MovieSelection form
+        public MovieSelection MovieSelectionForm
+        {
+            get { return movieSelectionForm; }
+            set { movieSelectionForm = value; }
+        }
+        public string SelectedMovie
+        {
+            get { return comboBox1.Text; }
+            set { comboBox1.Text = value; }
+        }
+        private MySqlConnection connection;
+        public Booking()
+        {
+            InitializeComponent();
+            InitializeDatabase();
+            PopulateUsernames();
+            PopulateMovieTitles();
+        }
+
+        private void InitializeDatabase()
+        {
+            string connectionString = "server=127.0.0.1; user=root; database=g5cinema; password=";
+            connection = new MySqlConnection(connectionString);
+        }
+
+        private void PopulateUsernames()
+        {
+            // Assuming textBoxUsername is the name of your TextBox for usernames
+            string selectQuery = "SELECT Username FROM userinfo";
+
+            try
+            {
+                connection.Open();
+                MySqlCommand command = new MySqlCommand(selectQuery, connection);
+                MySqlDataReader reader = command.ExecuteReader();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        private void PopulateMovieTitles()
+        {
+            string selectQuery = "SELECT Title FROM movies";
+
+            try
+            {
+                connection.Open();
+                MySqlCommand command = new MySqlCommand(selectQuery, connection);
+                MySqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    // Store Title in ComboBox
+                    comboBox1.Items.Add(reader["Title"].ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        private void CalculateTotalAmount()
+        {
+            // Assuming labelTotalAmount is the name of your label for total amount
+            if (int.TryParse(comboBox4.Text, out int numTickets) &&
+                comboBox1.SelectedItem != null)
+            {
+                string selectQuery = "SELECT Price FROM movies WHERE Title = @Title";
+
+                try
+                {
+                    connection.Open();
+                    MySqlCommand command = new MySqlCommand(selectQuery, connection);
+                    command.Parameters.AddWithValue("@Title", comboBox1.SelectedItem.ToString());
+                    object result = command.ExecuteScalar();
+
+                    if (result != null && decimal.TryParse(result.ToString(), out decimal price))
+                    {
+                        decimal totalAmount = numTickets * price;
+                        label7.Text = totalAmount.ToString("C");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            MovieSelection frm2 = new MovieSelection();
+
+            // Pass the selected values to MovieSelection form
+            frm2.SetSelectedValues(comboBox1.Text, comboBox2.Text);
+
+            frm2.ShowDialog();
+
+            // Restore selected values when returning from Booking form
+            frm2.RestoreSelectedValues();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+
+            // Generate a 6-digit unrepeatable combination number for ReceiptCode
+            string receiptCode = GenerateReceiptCode();
+
+            string insertBookingQuery = "INSERT INTO booking (Username, Title, BookingDate, ShowTime, NumTickets, TotalAmount) " +
+                                        "VALUES (@Username, @Title, @BookingDate, @ShowTime, @NumTickets, @TotalAmount)";
+
+
+            string insertReceiptQuery = "INSERT INTO receipts (ReceiptCode, BookingID, TransactionDate, AmountPaid) " +
+                                        "VALUES (@ReceiptCode, @BookingID, @TransactionDate, @AmountPaid)";
+
+            try
+            {
+                connection.Open();
+
+                // Insert data into booking table
+                MySqlCommand bookingCommand = new MySqlCommand(insertBookingQuery, connection);
+                bookingCommand.Parameters.AddWithValue("@Username", textBox1.Text);
+                bookingCommand.Parameters.AddWithValue("@Title", comboBox1.SelectedItem?.ToString());
+                bookingCommand.Parameters.AddWithValue("@BookingDate", comboBox2.Text);
+                bookingCommand.Parameters.AddWithValue("@ShowTime", comboBox3.Text);
+                bookingCommand.Parameters.AddWithValue("@NumTickets", comboBox4.Text);
+                bookingCommand.Parameters.AddWithValue("@TotalAmount", label7.Text.Replace("$", "").Trim());
+                bookingCommand.ExecuteNonQuery();
+
+                // Get the last inserted BookingID
+                int bookingID;
+                using (MySqlCommand lastBookingIDCommand = new MySqlCommand("SELECT LAST_INSERT_ID()", connection))
+                {
+                    bookingID = Convert.ToInt32(lastBookingIDCommand.ExecuteScalar());
+                }
+
+                // Insert data into receipts table
+                MySqlCommand receiptCommand = new MySqlCommand(insertReceiptQuery, connection);
+                receiptCommand.Parameters.AddWithValue("@ReceiptCode", receiptCode);
+                receiptCommand.Parameters.AddWithValue("@BookingID", bookingID);
+                receiptCommand.Parameters.AddWithValue("@TransactionDate", DateTime.Now); // You may need to adjust this based on your requirements
+                receiptCommand.Parameters.AddWithValue("@AmountPaid", label7.Text.Replace("$", "").Trim());
+                receiptCommand.ExecuteNonQuery();
+
+                MessageBox.Show("Booking and Receipt data inserted successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+
+                this.Hide();
+                Receipt Receiptfrm = new Receipt();
+                Receiptfrm.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+
+        }
+
+        private string GenerateReceiptCode()
+        {
+            // Generate a 6-digit unrepeatable combination number
+            Random rand = new Random();
+            HashSet<string> usedCodes = new HashSet<string>();
+
+            while (true)
+            {
+                int code = rand.Next(100000, 1000000);
+                string codeStr = code.ToString();
+
+                if (!usedCodes.Contains(codeStr))
+                {
+                    usedCodes.Add(codeStr);
+                    return codeStr;
+                }
+            }
+        }
+
+
+        private void label7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            CalculateTotalAmount();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string selectedMovieTitle = comboBox1.SelectedItem?.ToString();
+            string selectMovieQuery = "SELECT * FROM movies WHERE Title = @Title";
+
+            try
+            {
+                connection.Open();
+                MySqlCommand command = new MySqlCommand(selectMovieQuery, connection);
+                command.Parameters.AddWithValue("@Title", selectedMovieTitle);
+
+                MySqlDataReader reader = command.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    // ... (Other label assignments)
+
+                    // Get the PhotoURL of the selected movie
+                    string photoUrl = reader["PhotoURL"].ToString();
+                    DisplayImageFromUrl(photoUrl); // This function displays the image
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        private void DisplayImageFromUrl(string imageUrl)
+        {
+            try
+            {
+                WebClient webClient = new WebClient();
+                byte[] imageData = webClient.DownloadData(imageUrl);
+
+                using (MemoryStream ms = new MemoryStream(imageData))
+                {
+                    Image image = Image.FromStream(ms);
+                    pictureBox3.Image = image; // Display the image in pictureBox3
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading image: " + ex.Message);
+            }
+        }
+
+        private void pictureBox3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Booking_Load(object sender, EventArgs e)
+        {
+
+        }
+    }
+
+}
+
+---Receipt---
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+namespace G5_Cinema
+{
+    public partial class Receipt : Form
+    {
+        private MySqlConnection connection;
+        public Receipt()
+        {
+            InitializeComponent();
+            InitializeDatabase();
+            LoadReceiptDetails();
+        }
+
+        private void InitializeDatabase()
+        {
+            string connectionString = "server=127.0.0.1; user=root; database=g5cinema; password=";
+            connection = new MySqlConnection(connectionString);
+        }
+
+        private void LoadReceiptDetails()
+        {
+            // Load the latest receipt details into labels
+            string selectQuery = @"
+        SELECT receipts.ReceiptID, receipts.ReceiptCode, receipts.BookingID, 
+               receipts.TransactionDate, receipts.AmountPaid, genres.GenreID,
+               movies.Title, booking.NumTickets, movies.Price
+        FROM receipts
+        JOIN booking ON receipts.BookingID = booking.BookingID
+        JOIN movies ON booking.Title = movies.Title
+        JOIN genres ON movies.Title = genres.Title
+        ORDER BY receipts.ReceiptID DESC
+        LIMIT 1";
+
+            try
+            {
+                connection.Open();
+                MySqlCommand command = new MySqlCommand(selectQuery, connection);
+                MySqlDataReader reader = command.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    label1.Text = $"Receipt ID: {reader["ReceiptID"]}";
+                    label2.Text = $"{reader["ReceiptCode"]}";
+                    label3.Text = $"Booking ID: {reader["BookingID"]}";
+                    label4.Text = $"Transaction Date: {((DateTime)reader["TransactionDate"]).ToShortDateString()}";
+                    label5.Text = $"Total: {reader["AmountPaid"]}";
+                    label6.Text = $"Room Number: {reader["GenreID"]}";
+                    label7.Text = $"Title: {reader["Title"]}";
+                    label9.Text = $"Number of Tickets: {reader["NumTickets"]}";
+                    label10.Text = $"Price: {Convert.ToDouble(reader["Price"]):C}";
+
+                }
+                else
+                {
+                    MessageBox.Show("No receipt data found.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    this.Close(); // Close the ReceiptDetailsForm if no data is found
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close(); // Close the ReceiptDetailsForm on error
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        private void Receipt_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Form1 frm1 = new Form1();
+            frm1.ShowDialog();
+        }
+    }
+}
+
+---AdminForm---
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace G5_Cinema
+{
+    public partial class AdminForm : Form
+    {
+        public AdminForm()
+        {
+            InitializeComponent();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            UserList AUserfrm = new UserList();
+            AUserfrm.ShowDialog();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            MovieList AMoviefrm = new MovieList();
+            AMoviefrm.ShowDialog();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            BookingList ABookingfrm = new BookingList();
+            ABookingfrm.ShowDialog();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Form1 frm1 = new Form1();
+            frm1.ShowDialog();
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            JoinList Ajoinfrm = new JoinList();
+            Ajoinfrm.ShowDialog();
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pictureBox2_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void label14_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void label11_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            // Hide the current form
+            this.Hide();
+
+            // Create an instance of JoinList2
+            Creators CreatorsForm = new Creators();
+
+            // Show JoinList2
+            CreatorsForm.Show();
+        }
+    }
+}
+
+---UserList---
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+
+namespace G5_Cinema
+{
+    public partial class UserList : Form
+    {
+        private MySqlConnection connection;
+        public UserList()
+        {
+            InitializeComponent();
+            InitializeDatabase();
+        }
+
+        private void InitializeDatabase()
+        {
+            string connectionString = "server=127.0.0.1; user=root; database=g5cinema; password=";
+            connection = new MySqlConnection(connectionString);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            int userId;
+            if (int.TryParse(textBox1.Text, out userId))
+            {
+                SearchUserById(userId);
+            }
+            else
+            {
+                MessageBox.Show("Invalid user ID. Please enter a valid numeric ID.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void SearchUserById(int userId)
+        {
+            string selectQuery = "SELECT ID, FirstName, LastName, Gender, Birthday, Email, Username, DateCreated FROM userinfo WHERE ID = @ID";
+
+            try
+            {
+                connection.Open();
+                MySqlCommand command = new MySqlCommand(selectQuery, connection);
+                command.Parameters.AddWithValue("@ID", userId);
+
+                MySqlDataReader reader = command.ExecuteReader();
+
+                if (reader.HasRows)
+                {
+                    // Display the results in a DataGridView or another appropriate control
+                    DataTable dataTable = new DataTable();
+                    dataTable.Load(reader);
+                    dataGridView1.DataSource = dataTable;
+                }
+                else
+                {
+                    MessageBox.Show("User not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            string selectAllQuery = "SELECT ID, FirstName, LastName, Gender, Birthday, Email, Username, DateCreated\r\nFROM userinfo;";
+
+            try
+            {
+                connection.Open();
+                MySqlCommand command = new MySqlCommand(selectAllQuery, connection);
+
+                MySqlDataReader reader = command.ExecuteReader();
+
+                if (reader.HasRows)
+                {
+                    DataTable dataTable = new DataTable();
+                    dataTable.Load(reader);
+                    dataGridView1.DataSource = dataTable;
+                }
+                else
+                {
+                    MessageBox.Show("No data found.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            AdminForm Adminfrm = new AdminForm();
+            Adminfrm.ShowDialog();
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pictureBox3_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void pictureBox4_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void label11_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void label12_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            int userId;
+            if (int.TryParse(textBox1.Text, out userId))
+            {
+                SearchUserById(userId);
+            }
+            else
+            {
+                MessageBox.Show("Invalid user ID. Please enter a valid numeric ID.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+    }
+}
+
+---MovieList---
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+
+namespace G5_Cinema
+{
+    public partial class MovieList : Form
+    {
+        private MySqlConnection connection;
+
+        public MovieList()
+        {
+            InitializeComponent();
+            InitializeDatabase();
+        }
+
+        private void InitializeDatabase()
+        {
+            string connectionString = "server=127.0.0.1; user=root; database=g5cinema; password=";
+            connection = new MySqlConnection(connectionString);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            AdminForm Adminfrm = new AdminForm();
+            Adminfrm.ShowDialog();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            string title = textBox1.Text;
+            string director = textBox2.Text;
+            string genre = textBox3.Text;
+            DateTime releaseDate = dateTimePicker1.Value;
+            string timeDuration = textBox6.Text;
+            string photoUrl = textBox5.Text;
+            decimal price;
+
+            if (!decimal.TryParse(textBox4.Text, out price))
+            {
+                MessageBox.Show("Invalid price format. Please enter a valid numeric value.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Validate input
+            if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(director) || string.IsNullOrWhiteSpace(genre) ||
+                string.IsNullOrWhiteSpace(timeDuration))
+            {
+                MessageBox.Show("Please fill in all fields", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            string insertQuery = "INSERT INTO movies (Title, Director, Genre, ReleaseDate, TimeDuration, Price, PhotoURL) VALUES (@Title, @Director, @Genre, @ReleaseDate, @TimeDuration, @Price, @PhotoURL)";
+
+            try
+            {
+                connection.Open();
+                MySqlCommand command = new MySqlCommand(insertQuery, connection);
+                command.Parameters.AddWithValue("@Title", title);
+                command.Parameters.AddWithValue("@Director", director);
+                command.Parameters.AddWithValue("@Genre", genre);
+                command.Parameters.AddWithValue("@ReleaseDate", releaseDate);
+                command.Parameters.AddWithValue("@TimeDuration", timeDuration);
+                command.Parameters.AddWithValue("@Price", price);
+                command.Parameters.AddWithValue("@PhotoURL", photoUrl);
+                command.ExecuteNonQuery();
+
+                MessageBox.Show("Movie added successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            MovieList2 MList2frm = new MovieList2();
+            MList2frm.ShowDialog();
+        }
+
+        private void label7_Click(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
+
+---MovieList2---
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+namespace G5_Cinema
+{
+    public partial class MovieList2 : Form
+    {
+        private MySqlConnection connection;
+
+        public MovieList2()
+        {
+            InitializeComponent();
+            InitializeDatabase();
+        }
+
+        private void InitializeDatabase()
+        {
+            string connectionString = "server=127.0.0.1; user=root; database=g5cinema; password=";
+            connection = new MySqlConnection(connectionString);
+        }
+
+        private void ShowMoviesTable()
+        {
+            string selectAllQuery = "SELECT * FROM movies";
+
+            try
+            {
+                connection.Open();
+                MySqlCommand command = new MySqlCommand(selectAllQuery, connection);
+
+                MySqlDataReader reader = command.ExecuteReader();
+
+                if (reader.HasRows)
+                {
+                    DataTable dataTable = new DataTable();
+                    dataTable.Load(reader);
+                    dataGridView1.DataSource = dataTable;
+                }
+                else
+                {
+                    MessageBox.Show("No data found.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            ShowMoviesTable();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            int movieId;
+            if (int.TryParse(textBox1.Text, out movieId))
+            {
+                SearchMovieById(movieId);
+            }
+            else
+            {
+                MessageBox.Show("Invalid Movie ID. Please enter a valid numeric ID.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void SearchMovieById(int movieId)
+        {
+            string selectQuery = "SELECT * FROM movies WHERE MovieID = @MovieID";
+
+            try
+            {
+                connection.Open();
+                MySqlCommand command = new MySqlCommand(selectQuery, connection);
+                command.Parameters.AddWithValue("@MovieID", movieId);
+
+                MySqlDataReader reader = command.ExecuteReader();
+
+                if (reader.HasRows)
+                {
+                    // Display the results in a DataGridView or another appropriate control
+                    DataTable dataTable = new DataTable();
+                    dataTable.Load(reader);
+                    dataGridView1.DataSource = dataTable;
+                }
+                else
+                {
+                    MessageBox.Show("Movie not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (dataGridView1.SelectedRows.Count > 0)
+            {
+                DataRowView selectedRow = dataGridView1.SelectedRows[0].DataBoundItem as DataRowView;
+                if (selectedRow != null)
+                {
+                    DataRow rowToUpdate = selectedRow.Row;
+
+                    this.Hide();
+                    // Open the UpdateDeleteMovieForm for updating or deleting, passing the selected data
+                    MovieList3 updateDeleteForm = new MovieList3(rowToUpdate);
+                    updateDeleteForm.ShowDialog();
+
+                    // After updating or deleting, refresh the DataGridView
+                    ShowMoviesTable();
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a row to update or delete.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            MovieList MListfrm = new MovieList();
+            MListfrm.ShowDialog();
+        }
+
+        private void MovieList2_Load(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
+
+---MovieList3---
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+namespace G5_Cinema
+{
+    public partial class MovieList3 : Form
+    {
+        private MySqlConnection connection;
+        private DataRow movieDataRow;
+        public MovieList3(DataRow movieRow)
+        {
+            InitializeComponent();
+            InitializeDatabase();
+            movieDataRow = movieRow;
+            PopulateFields();
+        }
+
+        private void InitializeDatabase()
+        {
+            string connectionString = "server=127.0.0.1; user=root; database=g5cinema; password=";
+            connection = new MySqlConnection(connectionString);
+        }
+        private void PopulateFields()
+        {
+            // Populate the fields with existing data
+            textBox1.Text = movieDataRow["Title"].ToString();
+            textBox2.Text = movieDataRow["Director"].ToString();
+            textBox3.Text = movieDataRow["Genre"].ToString();
+            dateTimePicker1.Value = Convert.ToDateTime(movieDataRow["ReleaseDate"]);
+            textBox4.Text = movieDataRow["TimeDuration"].ToString();
+            textBox5.Text = movieDataRow["Price"].ToString();
+
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            MovieList2 MList2frm = new MovieList2();
+            MList2frm.ShowDialog();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                connection.Open();
+                string updateQuery = "UPDATE movies SET Title=@Title, Director=@Director, Genre=@Genre, ReleaseDate=@ReleaseDate, " +
+                    "TimeDuration=@TimeDuration, Price=@Price WHERE MovieID=@MovieID";
+
+                MySqlCommand command = new MySqlCommand(updateQuery, connection);
+                command.Parameters.AddWithValue("@Title", textBox1.Text);
+                command.Parameters.AddWithValue("@Director", textBox2.Text);
+                command.Parameters.AddWithValue("@Genre", textBox3.Text);
+                command.Parameters.AddWithValue("@ReleaseDate", dateTimePicker1.Value);
+                command.Parameters.AddWithValue("@TimeDuration", textBox4.Text);
+
+                decimal price;
+                if (decimal.TryParse(textBox5.Text, out price))
+                {
+                    command.Parameters.AddWithValue("@Price", price);
+                }
+                else
+                {
+                    MessageBox.Show("Invalid price format. Please enter a valid numeric value.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                command.Parameters.AddWithValue("@MovieID", movieDataRow["MovieID"]);
+
+                command.ExecuteNonQuery();
+                MessageBox.Show("Movie updated successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // Do not close the form after successful update
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                connection.Open();
+                string deleteQuery = "DELETE FROM movies WHERE MovieID=@MovieID";
+
+                MySqlCommand command = new MySqlCommand(deleteQuery, connection);
+                command.Parameters.AddWithValue("@MovieID", movieDataRow["MovieID"]);
+
+                command.ExecuteNonQuery();
+                MessageBox.Show("Movie deleted successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // Do not close the form after successful deletion
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+    }
+}
+
+---BookingList---
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+namespace G5_Cinema
+{
+    public partial class BookingList : Form
+    {
+        private MySqlConnection connection;
+        public BookingList()
+        {
+            InitializeComponent();
+            InitializeDatabase();
+        }
+
+        private void InitializeDatabase()
+        {
+            string connectionString = "server=127.0.0.1; user=root; database=g5cinema; password=";
+            connection = new MySqlConnection(connectionString);
+        }
+
+        private void ShowBookingsTable()
+        {
+            string selectAllQuery = "SELECT b.BookingID, b.Username, b.Title AS MovieTitle, b.BookingDate, b.ShowTime, b.NumTickets, b.TotalAmount, g.GenreID AS RoomNumber, g.GenreName\r\nFROM booking b\r\nINNER JOIN genres g ON b.Title = g.Title;";
+
+            try
+            {
+                connection.Open();
+                MySqlCommand command = new MySqlCommand(selectAllQuery, connection);
+
+                MySqlDataReader reader = command.ExecuteReader();
+
+                if (reader.HasRows)
+                {
+                    DataTable dataTable = new DataTable();
+                    dataTable.Load(reader);
+                    dataGridView1.DataSource = dataTable;
+                }
+                else
+                {
+                    MessageBox.Show("No data found.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            ShowBookingsTable();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            int bookingId;
+            if (int.TryParse(textBox1.Text, out bookingId))
+            {
+                SearchBookingById(bookingId);
+            }
+            else
+            {
+                MessageBox.Show("Invalid Booking ID. Please enter a valid numeric ID.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void SearchBookingById(int bookingId)
+        {
+            string selectQuery = "SELECT * FROM booking WHERE BookingID = @BookingID";
+
+            try
+            {
+                connection.Open();
+                MySqlCommand command = new MySqlCommand(selectQuery, connection);
+                command.Parameters.AddWithValue("@BookingID", bookingId);
+
+                MySqlDataReader reader = command.ExecuteReader();
+
+                if (reader.HasRows)
+                {
+                    // Display the results in a DataGridView or another appropriate control
+                    DataTable dataTable = new DataTable();
+                    dataTable.Load(reader);
+                    dataGridView1.DataSource = dataTable;
+                }
+                else
+                {
+                    MessageBox.Show("Booking not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (dataGridView1.SelectedRows.Count > 0)
+            {
+                DataRowView selectedRow = dataGridView1.SelectedRows[0].DataBoundItem as DataRowView;
+                if (selectedRow != null)
+                {
+                    DataRow rowToUpdate = selectedRow.Row;
+
+                    this.Hide();
+                    // Open the UpdateDeleteBookingForm for updating or deleting, passing the selected data
+                    BookingList2 updateDeleteForm = new BookingList2(rowToUpdate);
+                    updateDeleteForm.ShowDialog();
+
+                    // After updating or deleting, refresh the DataGridView
+                    ShowBookingsTable();
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a row to update or delete.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            AdminForm Adminfrm = new AdminForm();
+            Adminfrm.ShowDialog();
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
+
+---BookingList2---
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+namespace G5_Cinema
+{
+    public partial class BookingList2 : Form
+    {
+        private MySqlConnection connection;
+        private DataRow bookingDataRow;
+
+        public BookingList2()
+        {
+            InitializeComponent();
+            InitializeDatabase();
+        }
+        public BookingList2(DataRow bookingRow) : this()
+        {
+            bookingDataRow = bookingRow;
+            PopulateFields();
+        }
+        private void InitializeDatabase()
+        {
+            string connectionString = "server=127.0.0.1; user=root; database=g5cinema; password=";
+            connection = new MySqlConnection(connectionString);
+        }
+
+        private void PopulateFields()
+        {
+            // Populate the fields with existing data
+            textBox1.Text = bookingDataRow["BookingDate"].ToString();
+            textBox2.Text = bookingDataRow["ShowTime"].ToString();
+
+        }
+        private void button2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                connection.Open();
+                string updateQuery = "UPDATE booking SET BookingDate=@BookingDate, ShowTime=@ShowTime WHERE BookingID=@BookingID";
+
+                MySqlCommand command = new MySqlCommand(updateQuery, connection);
+                command.Parameters.AddWithValue("@BookingDate", textBox1.Text);
+                command.Parameters.AddWithValue("@ShowTime", textBox2.Text);
+                command.Parameters.AddWithValue("@BookingID", bookingDataRow["BookingID"]);
+
+                command.ExecuteNonQuery();
+                MessageBox.Show("Booking updated successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // Do not close the form after successful update
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            BookingList BList2frm = new BookingList();
+            BList2frm.ShowDialog();
+        }
+
+        private bool HasRelatedReceipt(int bookingID)
+        {
+            string checkReceiptQuery = "SELECT COUNT(*) FROM receipts WHERE BookingID = @BookingID";
+
+            MySqlCommand checkCommand = new MySqlCommand(checkReceiptQuery, connection);
+            checkCommand.Parameters.AddWithValue("@BookingID", bookingID);
+
+            int count = Convert.ToInt32(checkCommand.ExecuteScalar());
+            return count > 0;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                connection.Open();
+
+                // Check if there is a related receipt
+                int bookingID = Convert.ToInt32(bookingDataRow["BookingID"]);
+                if (HasRelatedReceipt(bookingID))
+                {
+                    // Delete the related receipt first
+                    string deleteReceiptQuery = "DELETE FROM receipts WHERE BookingID=@BookingID";
+                    MySqlCommand deleteReceiptCommand = new MySqlCommand(deleteReceiptQuery, connection);
+                    deleteReceiptCommand.Parameters.AddWithValue("@BookingID", bookingID);
+                    deleteReceiptCommand.ExecuteNonQuery();
+                }
+
+                // Proceed with deleting the booking
+                string deleteBookingQuery = "DELETE FROM booking WHERE BookingID=@BookingID";
+                MySqlCommand deleteBookingCommand = new MySqlCommand(deleteBookingQuery, connection);
+                deleteBookingCommand.Parameters.AddWithValue("@BookingID", bookingID);
+                deleteBookingCommand.ExecuteNonQuery();
+
+                MessageBox.Show("Booking deleted successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // Do not close the form after successful deletion
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+    }
+}
+
+---JoinList---
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+using static System.ComponentModel.Design.ObjectSelectorEditor;
+
+namespace G5_Cinema
+{
+    public partial class JoinList : Form
+    {
+        private MySqlConnection connection;
+        public JoinList()
+        {
+            InitializeComponent();
+            InitializeDatabase();
+        }
+
+        private void InitializeDatabase()
+        {
+            string connectionString = "server=127.0.0.1; user=root; database=g5cinema; password=";
+            connection = new MySqlConnection(connectionString);
+        }
+
+        private void ExecuteAndDisplayQueryResults(string query, string title)
+        {
+            try
+            {
+                connection.Open();
+
+                using (MySqlCommand command = new MySqlCommand(query, connection))
+                {
+                    using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
+                    {
+                        DataTable dataTable = new DataTable();
+                        adapter.Fill(dataTable);
+
+                        // Display the results in a DataGridView
+                        dataGridView1.DataSource = dataTable;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            // Execute SELECT JOIN JOIN query
+            string query = "SELECT \r\n    g.GenreID AS RoomNumber,\r\n    m.MovieID,\r\n    m.Title,\r\n    m.TimeDuration,\r\n    m.Price,\r\n    COUNT(b.BookingID) AS NumberOfBookings,\r\n    SUM(b.NumTickets) AS TotalTicketsBought,\r\n    SUM(b.NumTickets * m.Price) AS TotalIncome\r\nFROM \r\n    movies m \r\nJOIN \r\n    genres g ON m.Title = g.Title \r\nLEFT JOIN \r\n    booking b ON m.Title = b.Title \r\nGROUP BY \r\n    g.GenreID, \r\n    m.MovieID, \r\n    m.Title, \r\n    m.TimeDuration, \r\n    m.Price\r\nORDER BY \r\n    RoomNumber;\r\n";
+
+            ExecuteAndDisplayQueryResults(query, "SELECT JOIN JOIN Results");
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            AdminForm Adminfrm = new AdminForm();
+            Adminfrm.ShowDialog();
+        }
+
+---Creators---
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace G5_Cinema
+{
+    public partial class Creators : Form
+    {
+        public Creators()
+        {
+            InitializeComponent();
+        }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            AdminForm Adminfrm = new AdminForm();
+            Adminfrm.ShowDialog();
+        }
+    }
+}
+
