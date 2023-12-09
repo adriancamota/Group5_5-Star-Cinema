@@ -1,0 +1,88 @@
+--g5cinema Database
+
+--Table Creation
+
+
+-- Table creation for movies
+CREATE TABLE movies (
+  MovieID INT PRIMARY KEY,
+  Title VARCHAR(255) UNIQUE NOT NULL,
+  Director VARCHAR(255) NOT NULL,
+  Genre VARCHAR(100) NOT NULL,
+  ReleaseDate DATE NOT NULL,
+  TimeDuration VARCHAR(100) NOT NULL,
+  Price DECIMAL(8,2) NOT NULL,
+  PhotoURL VARCHAR(500) NOT NULL
+);
+
+-- Table creation for userinfo
+CREATE TABLE userinfo (
+  ID INT PRIMARY KEY,
+  FirstName VARCHAR(255) NOT NULL,
+  LastName VARCHAR(255) NOT NULL,
+  Gender VARCHAR(20) NOT NULL,
+  Birthday DATE NOT NULL,
+  Email VARCHAR(255) UNIQUE NOT NULL,
+  Username VARCHAR(255) UNIQUE NOT NULL,
+  Password VARCHAR(255) NOT NULL,
+  DateCreated TIMESTAMP NOT NULL DEFAULT current_timestamp
+);
+
+-- Table creation for booking
+CREATE TABLE booking (
+  BookingID INT PRIMARY KEY,
+  Username VARCHAR(255) REFERENCES userinfo(Username),
+  Title VARCHAR(255) REFERENCES movies(Title),
+  BookingDate DATE NOT NULL,
+  ShowTime VARCHAR(100) NOT NULL,
+  NumTickets INT NOT NULL,
+  TotalAmount VARCHAR(100) NOT NULL
+);
+
+-- Table creation for genres
+CREATE TABLE genres (
+  GenreID INT PRIMARY KEY,
+  GenreName VARCHAR(100) NOT NULL,
+  Title VARCHAR(255)
+);
+
+-- Table creation for receipts
+CREATE TABLE receipts (
+  ReceiptID INT PRIMARY KEY,
+  ReceiptCode VARCHAR(20) NOT NULL,
+  BookingID INT REFERENCES booking(BookingID),
+  TransactionDate TIMESTAMP NOT NULL DEFAULT current_timestamp,
+  AmountPaid VARCHAR(100) NOT NULL
+);
+
+-- Constraints for movies table
+ALTER TABLE movies
+  ADD CONSTRAINT fk_movies_title UNIQUE (Title);
+
+-- Constraints for userinfo table
+ALTER TABLE userinfo
+  ADD CONSTRAINT fk_userinfo_email UNIQUE (Email),
+  ADD CONSTRAINT fk_userinfo_username UNIQUE (Username);
+
+-- Constraints for booking table
+ALTER TABLE booking
+  ADD CONSTRAINT fk_booking_userinfo FOREIGN KEY (Username) REFERENCES userinfo(Username),
+  ADD CONSTRAINT fk_booking_movies FOREIGN KEY (Title) REFERENCES movies(Title);
+
+-- Constraints for genres table
+ALTER TABLE genres
+  ADD CONSTRAINT fk_genres_movies FOREIGN KEY (Title) REFERENCES movies(Title);
+
+-- Constraints for receipts table
+ALTER TABLE receipts
+  ADD CONSTRAINT fk_receipts_booking FOREIGN KEY (BookingID) REFERENCES booking(BookingID);
+
+-- Indexes for booking table
+CREATE INDEX idx_booking_username ON booking (Username);
+CREATE INDEX idx_booking_title ON booking (Title);
+
+-- Indexes for genres table
+CREATE INDEX idx_genres_title ON genres (Title);
+
+-- Indexes for receipts table
+CREATE INDEX idx_receipts_bookingid ON receipts (BookingID);

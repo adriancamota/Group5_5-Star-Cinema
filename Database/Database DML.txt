@@ -1,0 +1,197 @@
+
+
+-- Inserting 10 records into 'movies'
+INSERT INTO movies (MovieID, Title, Director, Genre, ReleaseDate, TimeDuration, Price, PhotoURL) VALUES
+(1, 'Spider-Man: No Way Home', 'Jon Watts', 'Action', '2023-12-01', '2h 23m', 340.50, 'https://www.movieposters.com/cdn/shop/products/255053349_408225954164881_580470973376990445_n_480x.progressive.jpg?v=1637860151'),
+(2, 'Avatar 2', 'James Cameron', 'Sci-Fi', '2023-12-01', '3h 12m', 320.50, 'https://www.movieposters.com/cdn/shop/products/avatar-the-way-of-water_sncuhzap_480x.progressive.jpg?v=1669382994&fbclid=IwAR3SxbNg2J0RsEcBw7_df7_mumMLkMUUFHmjzML1XLzlLhLdTIZNOUGM9fI'),
+(3, 'Uncharted', 'Ruben Fleischer', 'Adventure', '2023-12-03', '1h 56m', 330.50, 'https://www.movieposters.com/cdn/shop/products/scan005_94b2502d-2e23-452e-b5de-6601305895cd_480x.progressive.jpg?v=1670967687'),
+(4, 'No Hard Feelings', 'Gene Stupnitsky', 'Romance', '2023-12-04', '1h 43m', 330.50, 'https://www.movieposters.com/cdn/shop/files/no-hard-feelings_i7qiuup8_480x.progressive.jpg?v=1685987965'),
+(5, 'The Batman', 'Matt Reeves', 'Mystery', '2023-12-05', '2h 56m', 340.50, 'https://www.movieposters.com/cdn/shop/products/the-batman_rl8gg0zf_e36837ed-3673-4da7-8f91-939fb3ce2d9e_480x.progressive.jpg?v=1662131979&fbclid=IwAR2lMiQ6C_w4s0CqCn180tnKxBIrEEPivJC0hvhfusq4CFEE8OoCrEdSUHA'),
+(6, 'The Nun II', 'Corin Hardy', 'Horror', '2023-12-06', '1h 50m', 320.50, 'https://www.movieposters.com/cdn/shop/files/the-nun-ii_rfk5jd0a_480x.progressive.jpg?v=1690483976'),
+(7, 'Shazam! Fury of the Gods', 'David Sandberg', 'Comedy', '2023-12-07', '2h 10m', 320.50, 'https://www.movieposters.com/cdn/shop/products/shazam-fury-of-the-gods_mvdooqvg_480x.progressive.jpg?v=1680275713'),
+(8, 'Oppenheimer', 'Christopher Nolan', 'Thriller', '2023-12-08', '3h', 340.50, 'https://www.movieposters.com/cdn/shop/files/oppenheimer_ver3_480x.progressive.jpg?v=1685026118'),
+(9, 'Fantastic Beasts: The Secrets of Dumbledore', 'David Yates', 'Fantasy', '2023-12-09', '2h 23m', 330.50, 'https://www.movieposters.com/cdn/shop/products/fantastic-beasts-the-secrets-of-dumbledore_szqrjsid_480x.progressive.jpg?v=1677265878https%3A%2F%2Fwww.movieposters.com%2Fcdn%2Fshop%2Fproducts%2F315503859_1147571489197947_4925324120015583947_n_480x.progressive.jpg%3Fv%3D1670356276&fbclid=IwAR0zPK0QdxneSwf7q5lUP1Mq24Xh-raTLcMcU3lwraXP7TpjgKqFQbJjS8U'),
+(10, 'The Whale', 'Darren Aronofsky', 'Drama', '2023-12-10', '1h 57m', 330.50, 'https://www.movieposters.com/cdn/shop/products/scan_63d691e4-b962-400b-8a16-0ba4c43452e8_480x.progressive.jpg?v=1669321014');
+
+-- Inserting 10 records into 'genres'
+INSERT INTO genres (GenreID, GenreName, Title) VALUES
+(1, 'Action', 'Spider-Man: No Way Home'),
+(2, 'Comedy', 'Shazam! Fury of the Gods'),
+(3, 'Drama', 'The Whale'),
+(4, 'Sci-Fi', 'Avatar 2'),
+(5, 'Fantasy', 'Fantastic Beasts: The Secrets of Dumbledore'),
+(6, 'Romance', 'No Hard Feelings'),
+(7, 'Horror', 'The Nun II'),
+(8, 'Mystery', 'The Batman'),
+(9, 'Adventure', 'Uncharted'),
+(10, 'Thriller', 'Oppenheimer');
+
+-- Inserting 10 records into 'userinfo'
+INSERT INTO userinfo (ID, FirstName, LastName, Gender, Birthday, Email, Username, Password, DateCreated) VALUES
+(1, 'KC', 'Care', 'Male', '2009-08-20', 'kc@gmail.com', 'kckc', 'password', '2023-11-20 10:44:45'),
+(2, 'Adrian', 'Camota', 'Male', '2003-11-21', 'adriancamota@gmail.com', 'adi', 'adiadiadi', '2023-11-24 07:54:05'),
+(3, 'Gwy', 'Maralit', 'Female', '2023-12-07', 'gwy@gmail.com', 'gwy', 'password1', '2023-12-07 05:29:21'),
+(4, 'April Haizel', 'Angeles', 'Female', '2003-04-27', 'Zie@gmail.com', 'Zie', 'aprilganda', '2023-12-07 12:33:39'),
+(5, 'Sheena Mae', 'Arquillo', 'Female', '2023-12-07', 'shin@gmail.com', 'shim', 'barbie', '2023-12-07 05:32:56'),
+(6, 'Faith Anne', 'Banares', 'Female', '2021-07-22', 'faith@gmail.com', 'peyt', 'peytpeyt', '2023-12-07 12:37:58'),
+(7, 'Brian Neil', 'Babasa', 'Male', '2002-06-28', 'bri@gmail.com', 'bri', 'cantescape', '2023-12-07 12:39:51'),
+(8, 'Eiman Raphael', 'Bisa', 'Male', '2002-03-14', 'eiman@gmail.com', 'raphael', 'kotsenieiman', '2023-12-07 12:41:39'),
+(9, 'Ryle Hayden', 'Calingasan', 'Male', '2004-07-22', 'pres@gmail.com', 'presi', 'presryle', '2023-12-07 12:42:52'),
+(10,'Loki', 'Odinson', 'Male', '1983-06-16', 'loki@gmail.com', 'sylvie', 'godofstories', '2023-12-07 12:57:58');
+
+
+
+INSERT INTO booking (BookingID, Username, Title, BookingDate, ShowTime, NumTickets, TotalAmount) VALUES
+(53, 'kckc', 'Uncharted', '2023-12-15', '12:00 PM', 2, '₱661.00'),
+(56, 'adi', 'Avatar 2', '2023-12-13', '12:00 PM', 6, '₱1,923.00'),
+(57, 'peyt', 'The Whale', '2023-12-12', '3:00 PM', 4, '₱1,322.00'),
+(58, 'Zie', 'The Nun II', '2023-12-13', '3:00 PM', 2, '₱641.00'),
+(60, 'gwy', 'Fantastic Beasts: The Secrets of Dumbledore', '2023-12-14', '3:00 PM', 7, '₱2,313.50'),
+(61, 'bri', 'No Hard Feelings', '2023-12-12', '12:00 PM', 8, '₱2,644.00'),
+(62, 'presi', 'The Batman', '2023-12-13', '9:00 AM', 10, '₱3,405.00'),
+(63, 'raphael', 'Shazam! Fury of the Gods', '2023-12-13', '12:00 PM', 3, '₱961.50'),
+(65, 'sylvie', 'Oppenheimer', '2023-12-12', '12:00 PM', 9, '₱3,064.50'),
+(76, 'shim', 'Spider-Man: No Way Home', '2023-12-12', '12:00 PM', 3, '₱1,021.50');
+
+INSERT INTO receipts (ReceiptID, ReceiptCode, BookingID, TransactionDate, AmountPaid) VALUES
+(40, '875031', 53, '2023-12-07 12:44:23', '₱661.00'),
+(41, '506719', 56, '2023-12-07 12:46:22', '₱1,923.00'),
+(42, '716792', 57, '2023-12-07 12:47:38', '₱1,322.00'),
+(43, '526972', 58, '2023-12-07 12:48:41', '₱641.00'),
+(44, '442955', 60, '2023-12-07 12:49:29', '₱2,313.50'),
+(45, '474624', 61, '2023-12-07 12:50:50', '₱2,644.00'),
+(46, '247619', 62, '2023-12-07 12:51:25', '₱3,405.00'),
+(47, '205733', 63, '2023-12-07 12:52:09', '₱961.50'),
+(48, '595229', 65, '2023-12-07 12:59:35', '₱3,064.50'),
+(58, '494543', 76, '2023-12-08 03:16:45', '₱1,021.50');
+
+
+
+
+
+--all the data with @ symbol serves as the reader in Windows form app
+
+
+
+-----Movie Selection
+
+SELECT Title FROM movies ORDER BY Title
+
+SELECT GenreName FROM genres ORDER BY GenreName
+
+SELECT m.*, g.GenreName FROM movies m 
+JOIN genres g ON m.Title = g.Title 
+WHERE m.Title = @Title
+
+SELECT m.Title, m.Director, m.Genre, m.ReleaseDate, m.TimeDuration, m.Price, m.PhotoURL FROM movies m JOIN genres g ON m.Title = g.Title 
+WHERE g.GenreName = @GenreName
+
+
+----Log In
+
+SELECT * FROM userinfo WHERE Email = @Email AND Password = @Password
+
+
+-----Sign Up
+
+
+INSERT INTO userinfo (FirstName, LastName, Email, Username, Password, Gender, Birthday) VALUES (@FirstName, @LastName, @Email, @Username, @Password, @Gender, @Birthday
+
+-----Booking
+
+SELECT Username FROM userinfo
+
+SELECT Title FROM movies
+
+SELECT Price FROM movies WHERE Title = @Title
+
+
+INSERT INTO booking (Username, Title, BookingDate, ShowTime, NumTickets, TotalAmount) 
+         VALUES (@Username, @Title, @BookingDate, @ShowTime, @NumTickets, @TotalAmount)
+
+
+INSERT INTO receipts (ReceiptCode, BookingID, TransactionDate, AmountPaid) 
+       VALUES (@ReceiptCode, @BookingID, @TransactionDate, @AmountPaid)
+
+
+SELECT * FROM movies WHERE Title = @Title
+
+
+------Reciept
+
+SELECT receipts.ReceiptID, receipts.ReceiptCode, receipts.BookingID, 
+       receipts.TransactionDate, receipts.AmountPaid, genres.GenreID,
+       movies.Title, booking.NumTickets, movies.Price
+FROM receipts
+JOIN booking ON receipts.BookingID = booking.BookingID
+JOIN movies ON booking.Title = movies.Title
+JOIN genres ON movies.Title = genres.Title
+ORDER BY receipts.ReceiptID DESC
+LIMIT 1
+
+---Users List
+SELECT ID, FirstName, LastName, Gender, Birthday, Email, Username, DateCreated FROM userinfo WHERE ID = @ID
+
+SELECT ID, FirstName, LastName, Gender, Birthday, Email, Username, DateCreated FROM userinfo
+
+-----Movie List
+INSERT INTO movies (Title, Director, Genre, ReleaseDate, TimeDuration, Price, PhotoURL) VALUES (@Title, @Director, @Genre, @ReleaseDate, @TimeDuration, @Price, @PhotoURL)
+
+
+----Movie List 2
+SELECT * FROM movies
+
+SELECT * FROM movies WHERE MovieID = @MovieID
+
+----Movie List 3
+
+DELETE FROM movies WHERE MovieID=@MovieID
+
+
+UPDATE movies SET Title=@Title, Director=@Director, Genre=@Genre, ReleaseDate=@ReleaseDate, 
+                    TimeDuration=@TimeDuration, Price=@Price WHERE MovieID=@MovieID
+
+
+----Booking List
+
+SELECT b.BookingID, b.Username, b.Title AS MovieTitle, b.BookingDate, b.ShowTime, b.NumTickets, b.TotalAmount, g.GenreID AS RoomNumber, g.GenreName FROM booking b INNER JOIN genres g ON b.Title = g.Title
+
+SELECT * FROM booking WHERE BookingID = @BookingID
+
+
+-----Booking List 2
+
+UPDATE booking SET BookingDate=@BookingDate, ShowTime=@ShowTime WHERE BookingID=@BookingID
+
+DELETE FROM receipts WHERE BookingID=@BookingID
+
+DELETE FROM booking WHERE BookingID=@BookingID
+
+SELECT COUNT(*) FROM receipts WHERE BookingID = @BookingID
+
+
+----Room Number
+
+SELECT 
+    g.GenreID AS RoomNumber,
+    m.MovieID,
+    m.Title,
+    m.TimeDuration,
+    m.Price,
+    COUNT(b.BookingID) AS NumberOfBookings,
+    SUM(b.NumTickets) AS TotalTicketsBought,
+    SUM(b.NumTickets * m.Price) AS TotalIncome
+FROM 
+    movies m 
+JOIN 
+    genres g ON m.Title = g.Title 
+LEFT JOIN 
+    booking b ON m.Title = b.Title 
+GROUP BY 
+    g.GenreID, 
+    m.MovieID, 
+    m.Title, 
+    m.TimeDuration, 
+    m.Price
+ORDER BY 
+    RoomNumber;
