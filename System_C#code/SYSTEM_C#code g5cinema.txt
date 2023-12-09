@@ -877,11 +877,6 @@ namespace G5_Cinema
             }
         }
 
-        private void Receipt_Load(object sender, EventArgs e)
-        {
-
-        }
-
         private void button1_Click(object sender, EventArgs e)
         {
             this.Hide();
@@ -1843,11 +1838,6 @@ namespace G5_Cinema
         public Creators()
         {
             InitializeComponent();
-        }
-
-        private void label5_Click(object sender, EventArgs e)
-        {
-
         }
 
         private void button4_Click(object sender, EventArgs e)
